@@ -15,12 +15,12 @@ export default class Requester {
 	 * @param body The body to pass
 	 * @returns A result object. It will only be the Panic<unknown> variant if for some reason the request could not be made.
 	 */
-	#request(
+	async #request(
 		path: string,
 		method: 'GET' | 'POST' | 'PUT' | 'DELETE',
 		headers: Record<string, string> | null = null,
 		body: unknown = null
-	): Result<Promise<Response>, never, unknown> {
+	): Promise<Result<Response, never, unknown>> {
 		const url = `${this.#host}/${path.charAt(0) === '/' ? path.slice(1) : path}`;
 		const headers_to_pass: Record<string, string> = {};
 		let payload: string = '';
@@ -41,7 +41,7 @@ export default class Requester {
 			}
 		}
 		try {
-			const RESPONSE = fetch(url, {
+			const RESPONSE = await fetch(url, {
 				method,
 				headers: headers_to_pass,
 				body: method === 'GET' ? null : payload === '' ? null : payload
@@ -66,10 +66,11 @@ export default class Requester {
 	 * ATTENTION: if received data could not be parsed to JSON, it will parse data to plain text.
 	 */
 	async #parse_response<Data, Fail>(
-		resp: Result<Promise<Response>, never, unknown>
+		resp: Promise<Result<Response, never, unknown>>
 	): Promise<Result<Data, Fail, unknown>> {
-		if (resp.success) {
-			const resolved_response = await resp.original;
+		const awaited_resp: Awaited<typeof resp> = await resp;
+		if (awaited_resp.success) {
+			const resolved_response = awaited_resp.original;
 			if (resolved_response.ok) {
 				try {
 					return {
@@ -98,7 +99,7 @@ export default class Requester {
 				}
 			}
 		} else {
-			return resp;
+			return awaited_resp;
 		}
 	}
 	/**
@@ -124,7 +125,7 @@ export default class Requester {
 	 */
 	get auto_headers(): string[] {
 		const auto_headers: string[] = [];
-		for (const k in this.#auto_headers.keys()) {
+		for (const k of this.#auto_headers.keys()) {
 			auto_headers.push(k);
 		}
 		return auto_headers;
@@ -139,7 +140,7 @@ export default class Requester {
 	 */
 	GET<Data, Fail>(
 		path: string,
-		headers: Record<string, string>
+		headers?: Record<string, string>
 	): Promise<Result<Data, Fail, unknown>> {
 		return this.#parse_response<Data, Fail>(this.#request(path, 'GET', headers));
 	}
@@ -154,8 +155,8 @@ export default class Requester {
 	 */
 	POST<Payload, Data, Fail>(
 		path: string,
-		headers: Record<string, string>,
-		body: Payload
+		body: Payload,
+		headers?: Record<string, string>
 	): Promise<Result<Data, Fail, unknown>> {
 		return this.#parse_response(this.#request(path, 'POST', headers, body));
 	}
@@ -170,8 +171,8 @@ export default class Requester {
 	 */
 	PUT<Payload, Data, Fail>(
 		path: string,
-		headers: Record<string, string>,
-		body: Payload
+		body: Payload,
+		headers?: Record<string, string>
 	): Promise<Result<Data, Fail, unknown>> {
 		return this.#parse_response(this.#request(path, 'PUT', headers, body));
 	}
@@ -186,8 +187,8 @@ export default class Requester {
 	 */
 	DELETE<Payload, Data, Fail>(
 		path: string,
-		headers: Record<string, string>,
-		body: Payload
+		body: Payload,
+		headers?: Record<string, string>
 	): Promise<Result<Data, Fail, unknown>> {
 		return this.#parse_response(this.#request(path, 'PUT', headers, body));
 	}
