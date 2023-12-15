@@ -1,12 +1,18 @@
-type Ok<T> = {
+type Success<T> = {
 	success: true;
 	original: T;
 };
-type Err<E> = {
+type Failure<F> = {
 	success: false;
-	original: E;
+	reason: 'failure';
+	details: F;
+};
+type Panic<E> = {
+	success: false;
+	reason: 'panic';
+	error: E;
 };
 
-type Result<T, E> = Ok<T> | Err<E>;
+type Result<T, F, E> = Success<T> | Failure<F> | Panic<E>;
 
 export default Result;
