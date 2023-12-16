@@ -13,6 +13,4 @@ type Panic<E> = {
 	error: E;
 };
 
-type Result<T, F, E> = Success<T> | Failure<F> | Panic<E>;
-
-export default Result;
+export type Result<T, F, E> = Success<T> | Failure<F> | Panic<E>;
