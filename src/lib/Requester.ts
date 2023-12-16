@@ -1,5 +1,5 @@
-import Entries from '../types/Entries.type';
-import Result from '../types/Result.type';
+import type { Entries } from './types/Entries.type';
+import type { Result } from './types/Result.type';
 
 export default class Requester {
 	#host: string;
@@ -61,7 +61,7 @@ export default class Requester {
 	/**
 	 * Parse response to be read from outside functions
 	 * @param resp Whatever is returned form this.#request
-	 * @returns A result object. Panic<E> variant if resp.success is false (network error). 
+	 * @returns A result object. Panic<E> variant if resp.success is false (network error).
 	 * Failure<F> variant if inner Response.ok is false.
 	 * ATTENTION: if received data could not be parsed to JSON, it will parse data to plain text.
 	 */
