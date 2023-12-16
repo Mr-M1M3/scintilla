@@ -25,7 +25,6 @@
 				});
 		}
 	}
-	// console.log($page)
 	function save_code_verifier(provider: string, val: string) {
 		localStorage.setItem('login__code_verifier', val);
 		localStorage.setItem('login__provider', provider);

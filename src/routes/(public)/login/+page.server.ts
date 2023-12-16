@@ -14,7 +14,7 @@ export async function load({ locals }) {
 		error(500, 'internal server error');
 	}
 	auth_methods.original.authProviders.forEach(provider => {
-		// TODO: 
+		
 		if(provider.name === "google"){
 			provider.authUrl += `${GOOGLE_OAUTH_REDIRECTED_DOMAIN}/login`
 		}

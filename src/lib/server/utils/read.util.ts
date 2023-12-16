@@ -1,7 +1,6 @@
 import type { Result } from '$lib/types/Result.type';
 
 export default async function read<T>(req: Request): Promise<Result<T, unknown, unknown>> {
-	console.log(req.headers.get('content-type'));
 	if (req.headers.get('Content-Type') === 'application/x-www-form-urlencoded') {
 		try {
 			const form_data = await req.formData();
