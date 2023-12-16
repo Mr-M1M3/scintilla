@@ -1,4 +1,5 @@
 import GC_REG_PAYLOAD, { type GCRegPayload } from '$lib/server/schemas/GCREGPayload.schema';
+import {GOOGLE_OAUTH_REDIRECTED_DOMAIN} from "$env/static/private";
 import type AUthMethods from '$lib/types/AuthMethod.type';
 import type GC from '$lib/types/GeneralMember.type';
 import type OAuthFailure from '$lib/types/OAuthFailure.type';
@@ -22,7 +23,7 @@ export async function load({ locals }) {
 	auth_methods.original.authProviders.forEach((provider) => {
 		// TODO:
 		if (provider.name === 'google') {
-			provider.authUrl += 'http://localhost:5173/register';
+			provider.authUrl += `${GOOGLE_OAUTH_REDIRECTED_DOMAIN}/register`;
 		}
 	});
 

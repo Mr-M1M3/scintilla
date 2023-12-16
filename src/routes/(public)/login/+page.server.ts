@@ -1,4 +1,5 @@
-import type AUthMethods from '$lib/types/AuthMethod.type.js';
+import type AUthMethods from '$lib/types/AuthMethod.type';
+import {GOOGLE_OAUTH_REDIRECTED_DOMAIN} from "$env/static/private";
 import { error, redirect } from '@sveltejs/kit';
 
 export async function load({ locals }) {
@@ -15,7 +16,7 @@ export async function load({ locals }) {
 	auth_methods.original.authProviders.forEach(provider => {
 		// TODO: 
 		if(provider.name === "google"){
-			provider.authUrl += 'http://localhost:5173/login'
+			provider.authUrl += `${GOOGLE_OAUTH_REDIRECTED_DOMAIN}/login`
 		}
 	})
 	return {

@@ -1,10 +1,9 @@
 import { error } from '@sveltejs/kit';
 import Requester from './lib/Requester';
 import type GC from './lib/types/GeneralMember.type';
-// import util from "util";
-
+import {CONFIGURED_POCKETBASE_URL} from "$env/static/private";
 export async function handle({ event, resolve }) {
-	const client = new Requester('http://127.0.0.1:8090');
+	const client = new Requester(CONFIGURED_POCKETBASE_URL);
 	event.locals.requester = client;
 	const token = event.cookies.get('session') ?? '';
 	// TODO: GEt collection name form ENV
