@@ -7,16 +7,16 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
 	export let data;
+	import { goto } from '$app/navigation';
 	const auth_providers = data.oauth_providers;
-	const is_redirected_from_oauth_provider = $page.url.searchParams.has('code');
+	let is_redirected_from_oauth_provider = $page.url.searchParams.has('code');
 	let { form, enhance, errors } = superForm(data.superforms_data);
-	// if (browser) {
-	// 	if (!is_redirected_from_oauth_provider) {
-	// 		auth_providers.forEach((provider) => {
-	// 			localStorage?.setItem(provider.state, provider.codeVerifier);
-	// 		});
-	// 	}
-	// }
+	$: console.log($page);
+	$: if ($page.form && ($page.status >= 400 || $page.status < 500)) {
+		goto('/register').then((_) => {
+			is_redirected_from_oauth_provider = $page.url.searchParams.has('code');
+		});
+	}
 	function save_code_verifier(provider: string, val: string) {
 		localStorage.setItem('code_verifier', val);
 		localStorage.setItem('provider', provider);
@@ -35,12 +35,17 @@
 					on:click={() => {
 						save_code_verifier(name, codeVerifier);
 					}}
-					href="{authUrl}http://localhost:5173/register"
+					href={authUrl}
 					variant="outline"
 					size="lg"
 					class="w-full"
-					><span class="mx-1">Continue With {name}</span>
+					><span class="mx-1 w-full h-full flex justify-center items-center gap-2"
+						>Continue With <iconify-icon icon="mdi:{name}"></iconify-icon></span
+					>
 				</Button>
+				<a href="/login" class="text-gray-300 inline-block my-1 w-full text-right underline"
+					>Already Have An Account? Login.</a
+				>
 			</Card.Content>
 		</Card.Root>
 	{/each}

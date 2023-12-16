@@ -19,6 +19,12 @@ export async function load({ locals }) {
 		console.error(auth_methods);
 		error(500, `internal server error`);
 	}
+	auth_methods.original.authProviders.forEach((provider) => {
+		// TODO:
+		if (provider.name === 'google') {
+			provider.authUrl += 'http://localhost:5173/register';
+		}
+	});
 
 	const superforms_data = await superValidate(GC_REG_PAYLOAD);
 	return {
@@ -59,10 +65,7 @@ export const actions = {
 		);
 		if (!created_data.success) {
 			if (created_data.reason === 'failure') {
-				return fail(created_data.details.code, {
-					form_data,
-					created_data
-				});
+				return fail(400, {form_data, details: created_data.details})
 			} else {
 				error(500, 'internal server error');
 			}
@@ -71,7 +74,7 @@ export const actions = {
 				path: '/',
 				expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000)
 			});
-			redirect(303, '/dashboard');
+			redirect(307, '/dashboard');
 		}
 	}
 };

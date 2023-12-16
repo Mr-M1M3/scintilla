@@ -1,30 +1,44 @@
 import type { Result } from '$lib/types/Result.type';
 
 export default async function read<T>(req: Request): Promise<Result<T, unknown, unknown>> {
-	if (req.headers.get('Content-Type') !== 'multipart/form-data') {
-		return {
-			success: false,
-			reason: 'failure',
-			details: new TypeError('invalid content type')
-		};
-	}
-	try {
-		const form_data = await req.formData();
-		const jsonified: Record<string, unknown> = {};
-		for (const [k, v] of form_data.entries()) {
-			jsonified[k] = replace_malicious_chars_of(v as string);
+	console.log(req.headers.get('content-type'));
+	if (req.headers.get('Content-Type') === 'application/x-www-form-urlencoded') {
+		try {
+			const form_data = await req.formData();
+			const jsonified: Record<string, unknown> = {};
+			for (const [k, v] of form_data.entries()) {
+				jsonified[k] = replace_malicious_chars_of(v as string);
+			}
+			return {
+				success: true,
+				original: jsonified as T
+			};
+		} catch (e) {
+			return {
+				success: false,
+				reason: 'failure',
+				details: 'malformed data'
+			};
 		}
-		return {
-			success: true,
-			original: jsonified as T
-		};
-	} catch (e) {
-		return {
-			success: false,
-			reason: 'panic',
-			error: e
-		};
+	} else if (req.headers.get('Content-Type') === 'application/json') {
+		try {
+			return {
+				success: true,
+				original: (await req.json()) as T
+			};
+		} catch (e) {
+			return {
+				success: false,
+				reason: 'failure',
+				details: 'malformed data'
+			};
+		}
 	}
+	return {
+		success: false,
+		reason: 'failure',
+		details: new TypeError('invalid content type')
+	};
 }
 
 function replace_malicious_chars_of(str: string): string {
