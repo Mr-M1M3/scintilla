@@ -6,48 +6,53 @@
 	import { Label } from '$lib/components/ui/label';
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
-	import Icon from '@iconify/svelte';
 	export let data;
 	const auth_providers = data.oauth_providers;
-	const is_redirected_from_google = $page.url.searchParams.has('code');
+	const is_redirected_from_oauth_provider = $page.url.searchParams.has('code');
 	let { form, enhance, errors } = superForm(data.superforms_data);
-	if (browser) {
-		if (!is_redirected_from_google) {
-			auth_providers.forEach((provider) => {
-				localStorage?.setItem(provider.state, provider.codeVerifier);
-			});
-		}
+	// if (browser) {
+	// 	if (!is_redirected_from_oauth_provider) {
+	// 		auth_providers.forEach((provider) => {
+	// 			localStorage?.setItem(provider.state, provider.codeVerifier);
+	// 		});
+	// 	}
+	// }
+	function save_code_verifier(provider: string, val: string) {
+		localStorage.setItem('code_verifier', val);
+		localStorage.setItem('provider', provider);
 	}
 </script>
 
-{#if !is_redirected_from_google}
-	{#each auth_providers as { name, authUrl } (name)}
-		<Card.Root class="m-2">
+{#if !is_redirected_from_oauth_provider}
+	{#each auth_providers as { name, authUrl, codeVerifier } (name)}
+		<Card.Root class="m-2 max-w-screen-md mx-auto">
 			<Card.Header>
 				<Card.Title>Register</Card.Title>
 				<Card.Description>Be A Part Of Us</Card.Description>
 			</Card.Header>
 			<Card.Content>
 				<Button
+					on:click={() => {
+						save_code_verifier(name, codeVerifier);
+					}}
 					href="{authUrl}http://localhost:5173/register"
 					variant="outline"
 					size="lg"
 					class="w-full"
-					><span class="mx-1">Continue With Google</span>
-					<Icon icon="devicon:google" class="mx-2" /></Button
-				>
+					><span class="mx-1">Continue With {name}</span>
+				</Button>
 			</Card.Content>
 		</Card.Root>
 	{/each}
 {/if}
-{#if is_redirected_from_google}
+{#if is_redirected_from_oauth_provider}
 	<form method="POST" class="max-w-screen-md m-auto my-4 px-2" use:enhance>
 		{#if browser}
 			<input
 				type="text"
 				hidden
 				name="code_verifier"
-				value={localStorage?.getItem($page.url.searchParams.get('state') ?? '')}
+				value={localStorage?.getItem('code_verifier') ?? ''}
 			/>
 			<input
 				type="text"
@@ -55,6 +60,7 @@
 				name="oauth_code"
 				value={decodeURIComponent($page.url.searchParams.get('code') ?? '')}
 			/>
+			<input type="text" hidden name="provider" value={localStorage?.getItem('provider')} />
 		{/if}
 		<Card.Root>
 			<Card.Header>

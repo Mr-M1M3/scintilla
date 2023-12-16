@@ -16,6 +16,7 @@ export async function load({ locals }) {
 		'/api/collections/general_members/auth-methods'
 	);
 	if (!auth_methods.success) {
+		console.error(auth_methods);
 		error(500, `internal server error`);
 	}
 
@@ -33,13 +34,13 @@ export const actions = {
 		}
 		const user_credentials = form_data.data;
 		const created_data = await locals.requester.POST<
-			OAuthPayload<Omit<GCRegPayload, 'oauth_code' | 'code_verifier'>>,
+			OAuthPayload<Omit<GCRegPayload, 'oauth_code' | 'code_verifier' | 'provider'>>,
 			OAuthSuccess<GC, unknown>,
 			OAuthFailure
 		>(
 			'/api/collections/general_members/auth-with-oauth2',
 			{
-				provider: 'google',
+				provider: user_credentials.provider,
 				code: user_credentials.oauth_code,
 				codeVerifier: user_credentials.code_verifier,
 				redirectUrl: 'http://localhost:5173/register',

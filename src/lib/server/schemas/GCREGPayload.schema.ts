@@ -12,7 +12,8 @@ const GC_REG_PAYLOAD = z.object({
 		.string()
 		.regex(/^(\+?8801|01)(1|3|4|5|6|7|8|9)(\d){8}$/, 'invalid bangladeshi phone number'),
 	oauth_code: z.string(),
-	code_verifier: z.string()
+	code_verifier: z.string(),
+	provider: z.string()
 });
 
 export default GC_REG_PAYLOAD;
