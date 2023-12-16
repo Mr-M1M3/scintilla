@@ -4,7 +4,10 @@ import GC from './lib/types/GeneralMember.type';
 // for information about these interfaces
 declare global {
 	namespace App {
-		// interface Error {}
+		interface Error {
+			message: string;
+			id: string;
+		}
 		interface Locals {
 			user: GC | null;
 			requester: Requester;

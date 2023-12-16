@@ -1,7 +1,8 @@
 import { error } from '@sveltejs/kit';
 import Requester from './lib/Requester';
 import type GC from './lib/types/GeneralMember.type';
-import {CONFIGURED_POCKETBASE_URL} from "$env/static/private";
+import { CONFIGURED_POCKETBASE_URL } from '$env/static/private';
+import log_error from '$lib/server/utils/error-logger.util';
 export async function handle({ event, resolve }) {
 	const client = new Requester(CONFIGURED_POCKETBASE_URL);
 	event.locals.requester = client;
@@ -27,8 +28,23 @@ export async function handle({ event, resolve }) {
 				path: '/'
 			});
 		} else {
-			error(500, 'Internal Server Error');
+			const logged_error = log_error(user);
+			error(500, {
+				message: 'Internal server error',
+				id: logged_error.eid
+			});
 		}
 	}
 	return resolve(event);
+}
+export async function handleError({ error, message }) {
+	const logged_error = log_error({
+		success: false,
+		reason: 'panic',
+		error
+	});
+	return {
+		message,
+		id: logged_error.eid
+	};
 }

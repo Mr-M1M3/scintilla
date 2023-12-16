@@ -7,6 +7,7 @@ import type OAuthPayload from '$lib/types/OAuthPayload.type';
 import type OAuthSuccess from '$lib/types/OAuthSuccess.type';
 import { error, redirect, fail } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms/server';
+import log_error from '$lib/server/utils/error-logger.util.js';
 
 export async function load({ locals }) {
 	if (locals.user !== null) {
@@ -17,8 +18,11 @@ export async function load({ locals }) {
 		'/api/collections/general_members/auth-methods'
 	);
 	if (!auth_methods.success) {
-		console.error(auth_methods);
-		error(500, `internal server error`);
+		const logged_error = log_error(auth_methods);
+		error(500, {
+			message: 'internal server error',
+			id: logged_error.eid
+		});
 	}
 	auth_methods.original.authProviders.forEach((provider) => {
 		if (provider.name === 'google') {
@@ -67,7 +71,11 @@ export const actions = {
 			if (created_data.reason === 'failure') {
 				return fail(400, {form_data, details: created_data.details})
 			} else {
-				error(500, 'internal server error');
+				const logged_error = log_error(created_data);
+				error(500, {
+					message: 'internal server error',
+					id: logged_error.eid
+				});
 			}
 		} else {
 			cookies.set('session', created_data.original.token, {

@@ -1,6 +1,7 @@
 import type AUthMethods from '$lib/types/AuthMethod.type';
 import {GOOGLE_OAUTH_REDIRECTED_DOMAIN} from "$env/static/private";
 import { error, redirect } from '@sveltejs/kit';
+import log_error from '$lib/server/utils/error-logger.util.js';
 
 export async function load({ locals }) {
 	if (locals.user !== null) {
@@ -11,7 +12,11 @@ export async function load({ locals }) {
 		'/api/collections/general_members/auth-methods'
 	);
 	if (!auth_methods.success) {
-		error(500, 'internal server error');
+		const logged_error = log_error(auth_methods);
+		error(500, {
+			message: 'internal server error',
+			id: logged_error.eid
+		});
 	}
 	auth_methods.original.authProviders.forEach(provider => {
 		
