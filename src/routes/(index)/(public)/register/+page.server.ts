@@ -1,8 +1,9 @@
+// TODO: Respond 400 if user exist
 import GC_REG_PAYLOAD, { type GCRegPayload } from '$lib/server/schemas/GCREGPayload.schema';
-import {GOOGLE_OAUTH_REDIRECTED_DOMAIN} from "$env/static/private";
+import { GOOGLE_OAUTH_REDIRECTED_DOMAIN } from '$env/static/private';
 import type AUthMethods from '$lib/types/AuthMethod.type';
 import type GC from '$lib/types/GeneralMember.type';
-import type OAuthFailure from '$lib/types/OAuthFailure.type';
+import type { OAuthFailure } from '$lib/types/OAuthFailure.type';
 import type OAuthPayload from '$lib/types/OAuthPayload.type';
 import type OAuthSuccess from '$lib/types/OAuthSuccess.type';
 import { error, redirect, fail } from '@sveltejs/kit';
@@ -69,7 +70,7 @@ export const actions = {
 		);
 		if (!created_data.success) {
 			if (created_data.reason === 'failure') {
-				return fail(400, {form_data, details: created_data.details})
+				return fail(400, { form_data, details: created_data.details });
 			} else {
 				const logged_error = log_error(created_data);
 				error(500, {

@@ -1,5 +1,5 @@
 import type GC from '$lib/types/GeneralMember.type';
-import type OAuthFailure from '$lib/types/OAuthFailure.type';
+import type { OAuthFailure } from '$lib/types/OAuthFailure.type';
 import type OAuthSuccess from '$lib/types/OAuthSuccess.type';
 
 export async function POST({ request, locals, cookies }) {
