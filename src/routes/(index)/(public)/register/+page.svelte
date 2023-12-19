@@ -9,9 +9,10 @@
 	export let data;
 	import { goto } from '$app/navigation';
 	const auth_providers = data.oauth_providers;
+	// if(browser)
 	let is_redirected_from_oauth_provider = $page.url.searchParams.has('code');
 	let { form, enhance, errors } = superForm(data.superforms_data);
-	$: if ($page.form && ($page.status >= 400 || $page.status < 500)) {
+	$: if (browser && $page.form && ($page.status >= 400 || $page.status < 500)) {
 		goto('/register').then((_) => {
 			is_redirected_from_oauth_provider = $page.url.searchParams.has('code');
 		});
